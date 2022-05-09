@@ -93,7 +93,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Utils\Utils.Functions.pas"/>
-        <DCCReference Include="Connection\Dm_Principal.pas">
+        <DCCReference Include="Connection\Connection\Dm_Principal.pas">
             <Form>Dm1</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
@@ -110,6 +110,8 @@
         <DCCReference Include="Model\model.claims.pas"/>
         <DCCReference Include="Model\model.familiares.pas"/>
         <DCCReference Include="DAO\dao.familiares.pas"/>
+        <DCCReference Include="Connection\Connection\connection.firedac.pas"/>
+        <DCCReference Include="Connection\Query\query.firedac.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

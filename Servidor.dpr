@@ -5,11 +5,10 @@ program Servidor;
 
 uses
   Horse,
-  Horse.BasicAuthentication,
   System.SysUtils,
   System.Classes,
   Utils.Functions in 'Utils\Utils.Functions.pas',
-  Dm_Principal in 'Connection\Dm_Principal.pas' {Dm1: TDataModule},
+  Dm_Principal in 'Connection\Connection\Dm_Principal.pas' {Dm1: TDataModule},
   model.cliente in 'Model\model.cliente.pas',
   routers.cliente in 'Routers\routers.cliente.pas',
   dao.cliente in 'DAO\dao.cliente.pas',
@@ -22,7 +21,9 @@ uses
   Utils.Token in 'Utils\Utils.Token.pas',
   model.claims in 'Model\model.claims.pas',
   model.familiares in 'Model\model.familiares.pas',
-  dao.familiares in 'DAO\dao.familiares.pas';
+  dao.familiares in 'DAO\dao.familiares.pas',
+  connection.firedac in 'Connection\Connection\connection.firedac.pas',
+  query.firedac in 'Connection\Query\query.firedac.pas';
 
 procedure onListen(aHorse : THorse);
 begin

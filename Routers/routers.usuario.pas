@@ -4,7 +4,9 @@ interface
 
 uses
   Horse,
-  System.SysUtils, dao.usuario;
+  System.SysUtils,
+  dao.usuario,
+  connection.firedac;
 
 type
 
@@ -17,9 +19,16 @@ implementation
 { TRoutersCliente }
 
 procedure onAuth(aReq : THorseRequest; aRes : THorseResponse; aNext : TNextProc);
+var lCon : Integer;
 begin
-  aRes.ContentType('application/json')
-      .Send(TDAOUsuario.New.Token(aReq.Body));
+  try
+    lCon  := connection.firedac.Connected;
+
+    aRes.ContentType('application/json')
+        .Send(TDAOUsuario.New(lCon).Token(aReq.Body));
+  finally
+    connection.firedac.Disconnected(lCon);
+  end;
 end;
 
 class procedure TRoutersUsuario.Routers;

@@ -6,24 +6,23 @@ uses
   model.usuario,
   Utils.Result,
   System.SysUtils,
-  FireDAC.Comp.Client,
-  Dm_Principal;
+  query.firedac,
+  connection.firedac;
 
 type
 
   TDAOUsuario = class
   private
-    FDM       : TDm1;
-    FQry      : TFDQuery;
+    FQry      : TQueryFiredac;
     FResult   : TUtilsResult;
     FUsuario  : TModelUsuario;
   public
     function Login(aUser, aPassWord : String) : Boolean;
     function Token(aJson : String) : String;
 
-    constructor Create;
+    constructor Create(aCon : Integer);
     destructor Destroy; override;
-    class function New : TDAOUsuario;
+    class function New(aCon : Integer) : TDAOUsuario;
   end;
 
 implementation
@@ -33,16 +32,14 @@ uses
 
 const cTable    = 'usuario';
       cUser     = 'user';
+      cEmail    = 'email';
       cPassWord = 'password';
 
 { TDAOUsuario }
 
-constructor TDAOUsuario.Create;
+constructor TDAOUsuario.Create(aCon : Integer);
 begin
-  FDm       := TDm1.Create(nil);
-  FQry      := TFDQuery.Create(nil);
-  FQry.Connection := FDM.Conexao;
-
+  FQry      := TQueryFiredac.New(connection.firedac.FConnList.Items[aCon]);
   FResult   := TUtilsResult.New;
   FUsuario  := TModelUsuario.New;
 end;
@@ -52,7 +49,6 @@ begin
   FUsuario.Free;
   FResult.Free;
   FQry.Free;
-  FDm.Free;
 
   inherited;
 end;
@@ -61,23 +57,23 @@ function TDAOUsuario.Login(aUser, aPassWord: String): Boolean;
 begin
   Result  := False;
   try
-    FQry.Close;
-    FQry.SQL.Clear;
-    FQry.SQL.Add(format('select id from %s',[cTable]));
-    FQry.SQL.Add(format(' where %s = :%s',[cUser, cUser]));
-    FQry.SQL.Add(format(' and %s = :%s',[cPassWord, cPassWord]));
-    FQry.Params[0].AsString := aUser;
-    FQry.Params[1].AsString := aPassWord;
-    FQry.Open;
-    Result  := FQry.IsEmpty;
+    FQry.Qry.Close;
+    FQry.Qry.SQL.Clear;
+    FQry.Qry.SQL.Add(format('select id from %s',[cTable]));
+    FQry.Qry.SQL.Add(format(' where %s = :%s',[cUser, cUser]));
+    FQry.Qry.SQL.Add(format(' and %s = :%s',[cPassWord, cPassWord]));
+    FQry.Qry.Params[0].AsString := aUser;
+    FQry.Qry.Params[1].AsString := aPassWord;
+    FQry.Qry.Open;
+    Result  := FQry.Qry.IsEmpty;
   finally
-    FQry.Close;
+    FQry.Qry.Close;
   end;
 end;
 
-class function TDAOUsuario.New: TDAOUsuario;
+class function TDAOUsuario.New(aCon : Integer): TDAOUsuario;
 begin
-  Result  := Self.Create;
+  Result  := Self.Create(aCon);
 end;
 
 function TDAOUsuario.Token(aJson: String): String;
@@ -90,21 +86,21 @@ begin
       lJson.Parse(aJson);
 
       try
-        FQry.Close;
-        FQry.SQL.Clear;
-        FQry.SQL.Add(format('select id, user, email, password, issuer, name, subject from %s',[cTable]));
-        FQry.SQL.Add(format(' where %s = :%s',[cUser, cUser]));
-        FQry.SQL.Add(format(' and %s = :%s',[cPassWord, cPassWord]));
-        FQry.Params[0].AsString := lJson.Values['email'].AsString;
-        FQry.Params[1].AsString := lJson.Values['password'].AsString;
-        FQry.Open;
-        if not FQry.IsEmpty then
+        FQry.Qry.Close;
+        FQry.Qry.SQL.Clear;
+        FQry.Qry.SQL.Add(format('select id, user, email, password, issuer, name, subject from %s',[cTable]));
+        FQry.Qry.SQL.Add(format(' where %s = :%s',[cEmail, cEmail]));
+        FQry.Qry.SQL.Add(format(' and %s = :%s',[cPassWord, cPassWord]));
+        FQry.Qry.Params[0].AsString := lJson.Values['email'].AsString;
+        FQry.Qry.Params[1].AsString := lJson.Values['password'].AsString;
+        FQry.Qry.Open;
+        if not FQry.Qry.IsEmpty then
           Result  := FUsuario
-                      .Email(FQry.FieldByName('email').AsString)
-                      .Id(FQry.FieldByName('id').AsString)
-                      .Issuer(FQry.FieldByName('issuer').AsString)
-                      .Name(FQry.FieldByName('name').AsString)
-                      .Subject(FQry.FieldByName('subject').AsString)
+                      .Email(FQry.Qry.FieldByName('email').AsString)
+                      .Id(FQry.Qry.FieldByName('id').AsString)
+                      .Issuer(FQry.Qry.FieldByName('issuer').AsString)
+                      .Name(FQry.Qry.FieldByName('name').AsString)
+                      .Subject(FQry.Qry.FieldByName('subject').AsString)
                       .Token
         else
           Result  := FResult
@@ -112,7 +108,7 @@ begin
                       .StatusCode(404)
                       .ToString;
       finally
-        FQry.Close;
+        FQry.Qry.Close;
       end;
 
     end

@@ -20,7 +20,7 @@ implementation
 
 function Validation(const AUsername, APassword: string): Boolean;
 begin
-  Result := TDAOUsuario.New.Login(AUsername, APassword);
+//  Result := TDAOUsuario.New.Login(AUsername, APassword);
 end;
 
 class procedure TRoutersUsesCFG.UsesCFG;
