@@ -3,7 +3,10 @@ unit dao.usuario;
 interface
 
 uses
-  model.usuario, Utils.Result, System.SysUtils, FireDAC.Comp.Client,
+  model.usuario,
+  Utils.Result,
+  System.SysUtils,
+  FireDAC.Comp.Client,
   Dm_Principal;
 
 type
